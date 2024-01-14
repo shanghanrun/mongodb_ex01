@@ -4,29 +4,37 @@ import 'package:mongodb_ex01/db/mongodb.dart';
 import 'package:mongo_dart/mongo_dart.dart' as M;
 import 'package:mongodb_ex01/db/mongodbModel.dart';
 
-class MongoInsert extends StatefulWidget {
-  const MongoInsert({super.key});
+class MongoDbInsert extends StatefulWidget {
+  const MongoDbInsert({super.key});
 
   @override
-  State<MongoInsert> createState() => _MongoInsertState();
+  State<MongoDbInsert> createState() => _MongoDbInsertState();
 }
 
-class _MongoInsertState extends State<MongoInsert> {
+class _MongoDbInsertState extends State<MongoDbInsert> {
   final firstNameControl = TextEditingController();
   final lastNameControl = TextEditingController();
   final addressControl = TextEditingController();
 
+  var _checkInsertUpdate = "Insert Data";
+
   @override
   Widget build(BuildContext context) {
+    final data = ModalRoute.of(context)?.settings.arguments as MongoDbModel;
+    firstNameControl.text = data.firstName;
+    lastNameControl.text = data.lastName;
+    addressControl.text = data.address;
+    _checkInsertUpdate = "Update Data";
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              const Text(
-                'Insert Data',
-                style: TextStyle(fontSize: 22),
+              Text(
+                _checkInsertUpdate,
+                style: const TextStyle(fontSize: 22),
               ),
               const SizedBox(height: 50),
               Expanded(
@@ -66,7 +74,7 @@ class _MongoInsertState extends State<MongoInsert> {
                         await _insertData(firstNameControl.text,
                             lastNameControl.text, addressControl.text);
                       },
-                      child: const Text('Insert Data')),
+                      child: Text(_checkInsertUpdate)),
                 ],
               ),
             ],
