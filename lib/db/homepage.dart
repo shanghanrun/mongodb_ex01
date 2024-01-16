@@ -1,24 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:mongodb_ex01/db/insert.dart';
+import 'package:mongodb_ex01/db/queryData.dart';
+import 'package:mongodb_ex01/db/updateData.dart';
+import 'package:mongodb_ex01/db/insertData.dart';
 import 'package:mongodb_ex01/db/mongodb.dart';
 import 'package:mongodb_ex01/db/mongodbModel.dart';
 
-class MongoDbUpdate extends StatefulWidget {
-  const MongoDbUpdate({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<MongoDbUpdate> createState() => _MongoDbUpdateState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MongoDbUpdateState extends State<MongoDbUpdate> {
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          FloatingActionButton(
+            child: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const InsertData()));
+            },
+          ),
+          ElevatedButton(
+            child: const Icon(Icons.help),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const QueryData()));
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
           child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: FutureBuilder(
-            future: MongoDatabase.getData(), // 퓨처값 가져올 비동기 함수
+            future: MongoDB.getData(), // 퓨처값 가져올 비동기 함수
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -34,7 +55,7 @@ class _MongoDbUpdateState extends State<MongoDbUpdate> {
                     itemCount: users.length,
                     itemBuilder: (context, i) {
                       final user = users[i];
-                      return displayCard(MongoDbModel.fromJson(user));
+                      return displayCard(MongoDBModel.fromJson(user));
                     });
               }
             }),
@@ -42,7 +63,7 @@ class _MongoDbUpdateState extends State<MongoDbUpdate> {
     );
   }
 
-  Widget displayCard(MongoDbModel data) {
+  Widget displayCard(MongoDBModel data) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(15.0),
@@ -60,7 +81,7 @@ class _MongoDbUpdateState extends State<MongoDbUpdate> {
                 const SizedBox(height: 5),
                 Text(data.lastName),
                 const SizedBox(height: 5),
-                Text(data.address.substring(0, 20)),
+                Text(data.address.substring(0, 18)),
               ],
             ),
             IconButton(
@@ -69,14 +90,27 @@ class _MongoDbUpdateState extends State<MongoDbUpdate> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const MongoDbInsert(),
+                      builder: (context) => const UpdateData(),
                       settings: RouteSettings(arguments: data),
-                    ));
+                    )).then((value) => setState(() {}));
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () async {
+                await deleteData(data);
               },
             ),
           ],
         ),
       ),
     );
+  }
+
+  Future<void> deleteData(MongoDBModel data) async {
+    var result = await MongoDB.deleteData(data);
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        duration: Duration(seconds: 1), content: Text('A record was deleted')));
+    setState(() {});
   }
 }

@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:mongodb_ex01/db/mongodb.dart';
 import 'package:mongodb_ex01/db/mongodbModel.dart';
 
-class MongoDbDisplay extends StatefulWidget {
-  const MongoDbDisplay({super.key});
+class MongoDBDisplay extends StatefulWidget {
+  const MongoDBDisplay({super.key});
 
   @override
-  State<MongoDbDisplay> createState() => _MongoDbDisplayState();
+  State<MongoDBDisplay> createState() => _MongoDBDisplayState();
 }
 
-class _MongoDbDisplayState extends State<MongoDbDisplay> {
+class _MongoDBDisplayState extends State<MongoDBDisplay> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,7 +17,7 @@ class _MongoDbDisplayState extends State<MongoDbDisplay> {
           child: Padding(
         padding: const EdgeInsets.all(10.0),
         child: FutureBuilder(
-            future: MongoDatabase.getData(), // 퓨처값 가져올 비동기 함수
+            future: MongoDB.getData(), // 퓨처값 가져올 비동기 함수
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -33,7 +33,7 @@ class _MongoDbDisplayState extends State<MongoDbDisplay> {
                     itemCount: users.length,
                     itemBuilder: (context, i) {
                       final user = users[i];
-                      return displayCard(MongoDbModel.fromJson(user));
+                      return displayCard(MongoDBModel.fromJson(user));
                     });
               }
             }),
@@ -41,7 +41,7 @@ class _MongoDbDisplayState extends State<MongoDbDisplay> {
     );
   }
 
-  Widget displayCard(MongoDbModel data) {
+  Widget displayCard(MongoDBModel data) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(15.0),

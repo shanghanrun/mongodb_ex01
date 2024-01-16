@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mongodb_ex01/db/display.dart';
-import 'package:mongodb_ex01/db/insert.dart';
+import 'package:mongodb_ex01/db/updateData.dart';
 import 'package:mongodb_ex01/db/mongodb.dart';
-import 'package:mongodb_ex01/db/update.dart';
+import 'package:mongodb_ex01/db/homepage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await MongoDatabase.connect();
+  await MongoDB.connect();
   runApp(const MyApp());
 }
 
@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
       ),
       home: const Scaffold(
         // appBar: AppBar(title: const Text('mongo db 연습')),
-        body: MongoDbUpdate(),
+        body: HomePage(),
       ),
     );
   }

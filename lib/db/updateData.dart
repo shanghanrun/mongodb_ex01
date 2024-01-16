@@ -4,27 +4,29 @@ import 'package:mongodb_ex01/db/mongodb.dart';
 import 'package:mongo_dart/mongo_dart.dart' as M;
 import 'package:mongodb_ex01/db/mongodbModel.dart';
 
-class MongoDbInsert extends StatefulWidget {
-  const MongoDbInsert({super.key});
+class UpdateData extends StatefulWidget {
+  const UpdateData({super.key});
 
   @override
-  State<MongoDbInsert> createState() => _MongoDbInsertState();
+  State<UpdateData> createState() => _UpdateDataState();
 }
 
-class _MongoDbInsertState extends State<MongoDbInsert> {
+class _UpdateDataState extends State<UpdateData> {
   final firstNameControl = TextEditingController();
   final lastNameControl = TextEditingController();
   final addressControl = TextEditingController();
-
-  var _checkInsertUpdate = "Insert Data";
+  final ageControl = TextEditingController();
+  late MongoDBModel data;
+  late M.ObjectId id;
 
   @override
   Widget build(BuildContext context) {
-    final data = ModalRoute.of(context)?.settings.arguments as MongoDbModel;
+    data = ModalRoute.of(context)!.settings.arguments as MongoDBModel;
+    id = data.id;
     firstNameControl.text = data.firstName;
     lastNameControl.text = data.lastName;
     addressControl.text = data.address;
-    _checkInsertUpdate = "Update Data";
+    ageControl.text = (data.age).toString();
 
     return Scaffold(
       body: SafeArea(
@@ -32,9 +34,9 @@ class _MongoDbInsertState extends State<MongoDbInsert> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              Text(
-                _checkInsertUpdate,
-                style: const TextStyle(fontSize: 22),
+              const Text(
+                'Update Data',
+                style: TextStyle(fontSize: 22),
               ),
               const SizedBox(height: 50),
               Expanded(
@@ -53,6 +55,13 @@ class _MongoDbInsertState extends State<MongoDbInsert> {
               ),
               Expanded(
                 child: TextField(
+                  controller: ageControl,
+                  decoration: const InputDecoration(
+                      labelText: 'age', fillColor: Colors.blue),
+                ),
+              ),
+              Expanded(
+                child: TextField(
                   controller: addressControl,
                   minLines: 3,
                   maxLines: 5,
@@ -62,19 +71,18 @@ class _MongoDbInsertState extends State<MongoDbInsert> {
               ),
               const SizedBox(height: 30),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  OutlinedButton(
-                      onPressed: () {
-                        fakeData();
-                      },
-                      child: const Text('Generate Data')),
-                  OutlinedButton(
+                  ElevatedButton(
                       onPressed: () async {
-                        await _insertData(firstNameControl.text,
-                            lastNameControl.text, addressControl.text);
+                        await _updateData(
+                            id,
+                            firstNameControl.text,
+                            lastNameControl.text,
+                            addressControl.text,
+                            int.parse(ageControl.text));
                       },
-                      child: Text(_checkInsertUpdate)),
+                      child: const Text('Update Data')),
                 ],
               ),
             ],
@@ -84,29 +92,15 @@ class _MongoDbInsertState extends State<MongoDbInsert> {
     );
   }
 
-  void fakeData() {
-    setState(() {
-      firstNameControl.text = faker.person.firstName();
-      lastNameControl.text = faker.person.lastName();
-      addressControl.text =
-          "${faker.address.streetName()}\n${faker.address.streetAddress()}";
-    });
-  }
-
-  Future<void> _insertData(
-      String firstName, String lastName, String address) async {
-    var id = M.ObjectId(); // 저절로 Unique 키값을 생성해 준다.
-    final data = MongoDbModel(
-        id: id, firstName: firstName, lastName: lastName, address: address);
-    var result = await MongoDatabase.insertData(data);
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Inserted ID ${id.oid}\n$result')));
-    _clearAll();
-  }
-
-  void _clearAll() {
-    firstNameControl.text = '';
-    lastNameControl.text = '';
-    addressControl.text = '';
+  Future<void> _updateData(M.ObjectId id, String firstName, String lastName,
+      String address, int age) async {
+    final data = MongoDBModel(
+        id: id,
+        firstName: firstName,
+        lastName: lastName,
+        address: address,
+        age: age);
+    await MongoDB.updateData(data)
+        .whenComplete(() => Navigator.of(context).pop());
   }
 }
