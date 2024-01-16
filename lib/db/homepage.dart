@@ -27,7 +27,14 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           ElevatedButton(
-            child: const Icon(Icons.help),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color.fromARGB(255, 126, 223, 129),
+              minimumSize: const Size(60, 60), // 버튼의 최소 크기 설정
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20), // 버튼의 모서리를 둥글게 만듦
+              ),
+            ),
+            child: const Icon(Icons.help, size: 30),
             onPressed: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const QueryData()));
